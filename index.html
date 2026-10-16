@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>David Orta | Space Systems Telemetry &amp; Full-Stack Architecture</title>
+  <meta name="description" content="Personal academic ePortfolio of David Orta — Senior in Computer Science at CSUMB, UROC Koret Scholar, and researcher in small-satellite telemetry and STEM equity.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* CSS Variables & Dual Theme Engine */
+    :root[data-theme="dark"] {
+      --bg-base: #08110d;
+      --bg-surface: #0f1d17;
+      --bg-card: #152720;
+      --bg-card-hover: #1b3329;
+      --border: rgba(52, 211, 153, 0.12);
+      --border-accent: rgba(45, 212, 191, 0.35);
+      
+      --text-main: #f0fdf4;
+      --text-muted: #8fa89b;
+      --text-dim: #60796d;
+
+      --emerald: #10b981;
+      --emerald-glow: rgba(16, 185, 129, 0.2);
+      --jade: #2dd4bf;
+      --jade-glow: rgba(45, 212, 191, 0.18);
+      --amber: #f59e0b;
+      --forest-tint: rgba(16, 185, 129, 0.04);
+      --nav-glass: rgba(8, 17, 13, 0.85);
+      --shadow-elevation: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
+    }
+
+    :root[data-theme="light"] {
+      --bg-base: #f4f8f5;
+      --bg-surface: #ffffff;
+      --bg-card: #ffffff;
+      --bg-card-hover: #edf5f0;
+      --border: rgba(16, 185, 129, 0.16);
+      --border-accent: rgba(13, 148, 136, 0.4);
+      
+      --text-main: #0c1a14;
+      --text-muted: #476153;
+      --text-dim: #6b8577;
+
+      --emerald: #059669;
+      --emerald-glow: rgba(5, 150, 105, 0.15);
+      --jade: #0d9488;
+      --jade-glow: rgba(13, 148, 136, 0.15);
+      --amber: #d97706;
+      --forest-tint: rgba(16, 185, 129, 0.03);
+      --nav-glass: rgba(244, 248, 245, 0.88);
+      --shadow-elevation: 0 10px 25px -5px rgba(16, 185, 129, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    section {
+      padding: 5.5rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Navigation Bar */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--nav-glass);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 72px;
+    }
+
+    .logo {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 1.15rem;
+      color: var(--text-main);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .logo span {
+      color: var(--jade);
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    nav ul {
+      display: flex;
+      list-style: none;
+      gap: 1.75rem;
+    }
+
+    nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    nav a:hover {
+      color: var(--jade);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    /* Light/Dark Theme Switcher Button */
+    .theme-toggle-btn {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: var(--shadow-elevation);
+    }
+
+    .theme-toggle-btn:hover {
+      border-color: var(--jade);
+      transform: translateY(-1px);
+    }
+
+    .theme-toggle-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .sun-icon { display: none; }
+    .moon-icon { display: block; }
+
+    :root[data-theme="light"] .sun-icon { display: block; }
+    :root[data-theme="light"] .moon-icon { display: none; }
+
+    .btn-nav {
+      background: var(--jade-glow);
+      color: var(--jade);
+      border: 1px solid var(--jade);
+      padding: 0.45rem 1.1rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .btn-nav:hover {
+      background: var(--jade);
+      color: #08110d;
+    }
+
+    /* Hero Section */
+    .hero {
+      padding: 6.5rem 0 5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1.5rem;
+      position: relative;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--forest-tint);
+      border: 1px solid var(--border-accent);
+      color: var(--jade);
+      padding: 0.4rem 0.95rem;
+      border-radius: 9999px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .badge-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--emerald);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--emerald);
+    }
+
+    h1.hero-title {
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, var(--emerald) 0%, var(--jade) 60%, var(--amber) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-lead {
+      max-width: 820px;
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.8rem 1.6rem;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 1rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--emerald) 0%, var(--jade) 100%);
+      color: #06110b;
+      box-shadow: 0 4px 14px var(--emerald-glow);
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 6px 20px rgba(45, 212, 191, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: var(--bg-surface);
+      color: var(--text-main);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-elevation);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--text-muted);
+      transform: translateY(-2px);
+    }
+
+    /* Section Typography */
+    .section-header {
+      margin-bottom: 3.25rem;
+    }
+
+    .section-eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--jade);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .section-title {
+      font-size: 2.25rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+
+    /* About Section */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 3.5rem;
+      align-items: start;
+    }
+
+    .headshot-box {
+      width: 100%;
+      aspect-ratio: 4/5;
+      background: var(--bg-card);
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-elevation);
+    }
+
+    .headshot-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .headshot-placeholder {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-align: center;
+      padding: 1.5rem;
+    }
+
+    .about-meta {
+      margin-top: 1.25rem;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.1rem;
+      font-size: 0.9rem;
+      box-shadow: var(--shadow-elevation);
+    }
+
+    .about-meta div {
+      margin-bottom: 0.5rem;
+    }
+
+    .about-meta strong {
+      color: var(--jade);
+    }
+
+    .about-text p {
+      margin-bottom: 1.35rem;
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      line-height: 1.7;
+    }
+
+    /* Research Interests & 100-word Hook */
+    .hook-card {
+      background: linear-gradient(135deg, var(--forest-tint) 0%, rgba(45, 212, 191, 0.06) 100%);
+      border: 1px solid var(--border-accent);
+      border-radius: 14px;
+      padding: 2.25rem;
+      margin-bottom: 2.5rem;
+      position: relative;
+      box-shadow: var(--shadow-elevation);
+    }
+
+    .hook-badge {
+      position: absolute;
+      top: -12px;
+      left: 2rem;
+      background: linear-gradient(135deg, var(--emerald) 0%, var(--jade) 100%);
+      color: #06110b;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 0.25rem 0.75rem;
+      border-radius: 6px;
+      box-shadow: 0 2px 8px var(--emerald-glow);
+    }
+
+    .hook-text {
+      font-size: 1.18rem;
+      font-weight: 500;
+      color: var(--text-main);
+      line-height: 1.75;
+    }
+
+    .research-pillars {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.75rem;
+      margin-top: 2rem;
+    }
+
+    .pillar-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: var(--shadow-elevation);
+    }
+
+    .pillar-card h3 {
+      font-size: 1.25rem;
+      margin-bottom: 0.75rem;
+      color: var(--jade);
+    }
+
+    .pillar-card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    /* Project Cards (Curated Artifacts) */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 2rem;
+    }
+
+    .project-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-elevation);
+    }
+
+    .project-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--border-accent);
+      background: var(--bg-card-hover);
+    }
+
+    .project-thumb {
+      width: 100%;
+      height: 195px;
+      background: linear-gradient(135deg, #10241b 0%, #08140f 100%);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    :root[data-theme="light"] .project-thumb {
+      background: linear-gradient(135deg, #e3ede6 0%, #d5e5da 100%);
+    }
+
+    .project-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .project-thumb-placeholder {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-align: center;
+      padding: 1rem;
+    }
+
+    .project-content {
+      padding: 1.85rem;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    .project-dates {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--jade);
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+
+    .project-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      line-height: 1.35;
+      color: var(--text-main);
+    }
+
+    .project-abstract {
+      color: var(--text-muted);
+      font-size: 0.93rem;
+      margin-bottom: 1.25rem;
+      flex-grow: 1;
+      line-height: 1.6;
+    }
+
+    .project-reflection {
+      background: var(--bg-card);
+      border-left: 3px solid var(--jade);
+      padding: 0.85rem 1.1rem;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 1.25rem;
+      font-size: 0.86rem;
+      color: var(--text-main);
+    }
+
+    .project-reflection strong {
+      color: var(--emerald);
+      display: block;
+      margin-bottom: 0.25rem;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .tech-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-bottom: 1rem;
+    }
+
+    .tech-tag {
+      background: var(--forest-tint);
+      color: var(--jade);
+      border: 1px solid var(--border);
+      padding: 0.2rem 0.55rem;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    .project-badge {
+      display: inline-flex;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--amber);
+      margin-top: auto;
+    }
+
+    /* CV Section */
+    .cv-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 2.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      box-shadow: var(--shadow-elevation);
+    }
+
+    .cv-frame-container {
+      width: 100%;
+      height: 600px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      background: #ffffff;
+    }
+
+    .cv-frame-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* Affiliations */
+    .affiliations-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .affiliation-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.75rem;
+      text-align: center;
+      box-shadow: var(--shadow-elevation);
+    }
+
+    .affiliation-box h4 {
+      font-size: 1.15rem;
+      color: var(--text-main);
+      margin-bottom: 0.35rem;
+    }
+
+    .affiliation-box span {
+      font-size: 0.85rem;
+      color: var(--jade);
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+    }
+
+    /* Footer */
+    footer {
+      padding: 3.5rem 0;
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      border-top: 1px solid var(--border);
+    }
+
+    @media (max-width: 900px) {
+      .about-grid {
+        grid-template-columns: 1fr;
+      }
+      .headshot-box {
+        max-width: 320px;
+        margin: 0 auto;
+      }
+      nav ul {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Site Navigation -->
+  <header>
+    <div class="container nav-container">
+      <a href="#home" class="logo">
+        <span>&gt;_</span> DAVID ORTA
+      </a>
+      
+      <nav>
+        <ul>
+          <li><a href="#about">About</a></li>
+          <li><a href="#research">Research</a></li>
+          <li><a href="#projects">Artifacts &amp; Projects</a></li>
+          <li><a href="#cv">Curriculum Vitae</a></li>
+          <li><a href="#affiliations">Affiliations</a></li>
+        </ul>
+
+        <div class="nav-actions">
+          <!-- Light/Dark Mode Switcher -->
+          <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle theme">
+            <!-- Moon Icon (for dark mode) -->
+            <svg class="moon-icon" viewBox="0 0 24 24">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+            <!-- Sun Icon (for light mode) -->
+            <svg class="sun-icon" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+          </button>
+
+          <a href="mailto:david.orta.research@gmail.com" class="btn-nav">Contact</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main id="home" class="container">
+    <section class="hero">
+      <div class="badge">
+        <span class="badge-dot"></span>
+        CSUMB Senior &bull; Fall 2026 UROC Koret Scholar &bull; AGU '26 Presenter
+      </div>
+      <h1 class="hero-title">
+        Bridging Space Systems Telemetry &amp; <span class="gradient-text">STEM Educational Equity</span>
+      </h1>
+      <p class="hero-lead">
+        I am a Computer Science researcher at California State University, Monterey Bay, developing low-cost ground-station pipelines, sensor mechatronics, and full-stack software architectures to democratize small-satellite operations for rural and historically underrepresented scholars.
+      </p>
+      <div class="hero-actions">
+        <a href="#projects" class="btn btn-primary">Explore Research Artifacts</a>
+        <a href="assets/david-orta-cv.pdf" target="_blank" class="btn btn-secondary">Download Academic CV</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- About Section -->
+  <section id="about">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-eyebrow">Professional Profile</div>
+        <h2 class="section-title">About Me</h2>
+      </div>
+
+      <div class="about-grid">
+        <div class="about-image-wrapper">
+          <div class="headshot-box">
+            <img src="assets/david-headshot.jpg" alt="David Orta" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <div class="headshot-placeholder" style="display: none;">
+              [Photo Placeholder]<br>Place headshot at:<br><code>assets/david-headshot.jpg</code>
+            </div>
+          </div>
+          <div class="about-meta">
+            <div><strong>Institution:</strong> CSU Monterey Bay</div>
+            <div><strong>Major:</strong> B.S. Computer Science ('27)</div>
+            <div><strong>Foundational:</strong> 3 Degrees, Hartnell College</div>
+            <div><strong>Affiliation:</strong> Science Voices / BMSIS</div>
+          </div>
+        </div>
+
+        <div class="about-text">
+          <p>
+            I am a senior Computer Science student at California State University, Monterey Bay (CSUMB) with a deep technical focus on full-stack web architectures, mission-control telemetry pipelines, and embedded mechatronics. My academic journey began at Hartnell Community College, where I earned three Associate degrees while leading competitive research teams with NASA NCAS, CaSGC, and the Naval Postgraduate School.
+          </p>
+          <p>
+            As a <strong>Fall 2026 UROC Koret Scholar</strong>, I collaborate with research mentor Dr. Lev Horodyskyj (Science Voices / Blue Marble Space Institute of Science) and my lab partner Daniel Orta to engineer <strong>Orbital Sentinel</strong>—a mission control dashboard that streams live flight telemetry and tracks near-Earth satellite orbits in 3D.
+          </p>
+          <p>
+            Beyond the command line, I am the co-founder of the <strong>Artistic-Civic League United (A-CLUe)</strong> and an officer in the CSUMB <strong>Science, Arts, and Leadership Club (SALC)</strong>. Coming from the agricultural heartland of South Monterey County, I have made it my mission to ensure that advanced systems engineering and space science are not walled off by economic privilege. I direct community maker spaces, deploy open hardware build guides, and conduct field workshops that empower the next generation of rural engineers.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Research Interests Section -->
+  <section id="research">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-eyebrow">Intellectual Agenda</div>
+        <h2 class="section-title">Research Interests &amp; Framework</h2>
+      </div>
+
+      <!-- UROC Level 1 ~100-word Non-Technical Hook -->
+      <div class="hook-card">
+        <span class="hook-badge">Core Research Hook</span>
+        <p class="hook-text">
+          "Access to space science should not be limited by zip codes, institutional prestige, or multimillion-dollar budgets. My research democratizes aerospace engineering and remote sensing for rural, underrepresented communities. By pairing everyday microcontrollers like the ESP32 with accessible web-based flight dashboards, we transform consumer drones and high-altitude balloons into practical training analogs for orbital satellites. Through this hands-on framework, students build physical environmental sensors, stream live telemetry, and analyze real-world planetary data—bridging the gap between fundamental classroom concepts and real flight operations to cultivate the next generation of engineers."
+        </p>
+      </div>
+
+      <div class="research-pillars">
+        <div class="pillar-card">
+          <h3>Full-Stack Telemetry Pipelines</h3>
+          <p>
+            Designing high-throughput ground station web architectures using Node.js, Express, MySQL, and dynamic client-side AJAX polling. We ingest real-time sensor streams without browser latency and model orbital dynamics using 3D CelesTrak satellite ephemeris data.
+          </p>
+        </div>
+        <div class="pillar-card">
+          <h3>Terrestrial Flight Analogs</h3>
+          <p>
+            Decoupling space operations pedagogy from costly orbital launches. Utilizing Unmanned Aerial Vehicles (UAVs) and High-Altitude Sensing Balloons (HASB) as empirical testing grounds for sensor payloads, RF communications, and NASA Science Traceability Matrices (STMs).
+          </p>
+        </div>
+        <div class="pillar-card">
+          <h3>Needs-Responsive STEM Equity</h3>
+          <p>
+            Addressing geographic and socio-economic education barriers in the Salinas Valley. Designing bilingual, modular hardware build guides (Greenworks Workshop) and mobile labs that build verified confidence in circuit design and embedded software programming.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Projects / Artifacts Section (Collect, Select, Reflect) -->
+  <section id="projects">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-eyebrow">Curated Evidence &amp; Artifacts</div>
+        <h2 class="section-title">Research Projects &amp; Reflections</h2>
+        <p style="color: var(--text-muted); margin-top: 0.5rem;">
+          Selected milestones illustrating systems engineering, software design, and field deployment (2021–2026).
+        </p>
+      </div>
+
+      <div class="projects-grid">
+
+        <!-- 01. AGU 2026 / Orbital Sentinel -->
+        <article class="project-card">
+          <div class="project-thumb">
+            <img src="assets/project-orbital-sentinel.png" alt="Orbital Sentinel" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <div class="project-thumb-placeholder" style="display: none;">
+              [Project Diagram Placeholder]<br><code>assets/project-orbital-sentinel.png</code>
+            </div>
+          </div>
+          <div class="project-content">
+            <div class="project-dates">Fall 2026 &bull; AGU Fall Meeting</div>
+            <h3 class="project-title">Greenworks &amp; Orbital Sentinel: Small-Sat Ground Ops</h3>
+            <p class="project-abstract">
+              Engineered an integrated ground-station training ecosystem coupling the Orbital Sentinel telemetry interface with the Greenworks modular ESP32 build guides for community science.
+            </p>
+            <div class="project-reflection">
+              <strong>Reflective Insight:</strong>
+              Demonstrated that web-based telemetry interfaces reduce cognitive barriers in satellite operations when paired with physical sensor builds.
+            </div>
+            <div class="tech-tags">
+              <span class="tech-tag">Node.js</span>
+              <span class="tech-tag">Express</span>
+              <span class="tech-tag">MySQL</span>
+              <span class="tech-tag">ESP32</span>
+              <span class="tech-tag">AGU '26</span>
+            </div>
+            <div class="project-badge">&bull; Accepted Abstract ID: 2096970 (MacGyver Session)</div>
+          </div>
+        </article>
+
+        <!-- 02. UROC Koret Scholars -->
+        <article class="project-card">
+          <div class="project-thumb">
+            <img src="assets/project-uroc-koret.png" alt="UROC Koret" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <div class="project-thumb-placeholder" style="display: none;">
+              [Pipeline Diagram Placeholder]<br><code>assets/project-uroc-koret.png</code>
+            </div>
+          </div>
+          <div class="project-content">
+            <div class="project-dates">2026 – 2027 &bull; UROC Koret Fellowship</div>
+            <h3 class="project-title">Telemetry Ingestion &amp; Ground Station Systems</h3>
+            <p class="project-abstract">
+              Funded CSUMB research evaluating how real-time telemetry streaming enhances student mastery of NASA Science Traceability Matrices (STMs) ahead of a high-altitude balloon mission.
+            </p>
+            <div class="project-reflection">
+              <strong>Reflective Insight:</strong>
+              Established the technical pipeline linking field sensors to relational database logs, proving software stability for live telemetry.
+            </div>
+            <div class="tech-tags">
+              <span class="tech-tag">REST APIs</span>
+              <span class="tech-tag">Database Schema</span>
+              <span class="tech-tag">HASB Balloon</span>
+            </div>
+            <div class="project-badge">&bull; Funded $1,000 Research Award</div>
+          </div>
+        </article>
+
+        <!-- 03. Cal Poly CDW 2026 -->
+        <article class="project-card">
+          <div class="project-thumb">
+            <img src="assets/project-cdw-cubesat.png" alt="Cal Poly CDW" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <div class="project-thumb-placeholder" style="display: none;">
+              [Architecture Diagram Placeholder]<br><code>assets/project-cdw-cubesat.png</code>
+            </div>
+          </div>
+          <div class="project-content">
+            <div class="project-dates">Spring 2026 &bull; Cal Poly CDW &amp; CST 336</div>
+            <h3 class="project-title">Distributed CubeSat Framework via Terrestrial Analogs</h3>
+            <p class="project-abstract">
+              Engineered the Minimum Viable Product (MVP) of Orbital Sentinel, featuring automated flight simulators, REST API telemetry adapters, and 3D CelesTrak satellite tracking.
+            </p>
+            <div class="project-reflection">
+              <strong>Reflective Insight:</strong>
+              Showcased that consumer drones can simulate orbital telemetry passes at a fraction of satellite deployment costs.
+            </div>
+            <div class="tech-tags">
+              <span class="tech-tag">AJAX Polling</span>
+              <span class="tech-tag">REST Adapters</span>
+              <span class="tech-tag">CelesTrak</span>
+            </div>
+            <div class="project-badge">&bull; Peer-Reviewed Presentation &amp; CST 336 Honors</div>
+          </div>
+        </article>
+
+        <!-- 04. Greenworks in Greenfield 2025 -->
+        <article class="project-card">
+          <div class="project-thumb">
+            <img src="assets/project-gig-pilot.png" alt="GiG Pilot" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <div class="project-thumb-placeholder" style="display: none;">
+              [Field Photo Placeholder]<br><code>assets/project-gig-pilot.png</code>
+            </div>
+          </div>
+          <div class="project-content">
+            <div class="project-dates">Summer 2025 &bull; Hartnell STEM / TRIO</div>
+            <h3 class="project-title">Greenworks in Greenfield: Summer Pilot Intervention</h3>
+            <p class="project-abstract">
+              Coordinated a 4-week mechatronics and drone telemetry pilot for underrepresented community college students, incorporating international virtual exchange with UNICAMP Brazil.
+            </p>
+            <div class="project-reflection">
+              <strong>Reflective Insight:</strong>
+              Pivoted curriculum dynamically using gamified review modules when students encountered friction with complex NASA STMs.
+            </div>
+            <div class="tech-tags">
+              <span class="tech-tag">Arduino</span>
+              <span class="tech-tag">Pedagogy</span>
+              <span class="tech-tag">Field Operations</span>
+            </div>
+            <div class="project-badge">&bull; +53.8% Circuit Building Confidence</div>
+          </div>
+        </article>
+
+        <!-- 05. NPS Serious Gaming CheckPoint -->
+        <article class="project-card">
+          <div class="project-thumb">
+            <img src="assets/project-nps-ecco.png" alt="NPS CheckPoint" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <div class="project-thumb-placeholder" style="display: none;">
+              [Game Simulation Placeholder]<br><code>assets/project-nps-ecco.png</code>
+            </div>
+          </div>
+          <div class="project-content">
+            <div class="project-dates">Summer 2023 &bull; Naval Postgraduate School / SACNAS</div>
+            <h3 class="project-title">Serious Gaming for Defense Analysis (CheckPoint)</h3>
+            <p class="project-abstract">
+              Evaluated strategic player friction and cognitive load across 32 real-world action cards simulating interagency counter-terrorism operations under Dr. Matthew Zefferman.
+            </p>
+            <div class="project-reflection">
+              <strong>Reflective Insight:</strong>
+              Learned how mechanics and structured decision trees can model human behavior in high-stakes operational environments.
+            </div>
+            <div class="tech-tags">
+              <span class="tech-tag">GitLab</span>
+              <span class="tech-tag">Cognitive Modeling</span>
+              <span class="tech-tag">Simulation</span>
+            </div>
+            <div class="project-badge">&bull; SACNAS NDISTEM 2023 Presentation</div>
+          </div>
+        </article>
+
+        <!-- 06. NASA MITTIC OmniZero -->
+        <article class="project-card">
+          <div class="project-thumb">
+            <img src="assets/project-nasa-mittic.png" alt="NASA MITTIC" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <div class="project-thumb-placeholder" style="display: none;">
+              [CAD Schematic Placeholder]<br><code>assets/project-nasa-mittic.png</code>
+            </div>
+          </div>
+          <div class="project-content">
+            <div class="project-dates">Spring 2023 &bull; NASA Johnson Space Center</div>
+            <h3 class="project-title">NASA MITTIC: OmniZero Autonomous EV</h3>
+            <p class="project-abstract">
+              Led the Pantherbotics team in commercializing NASA-patented Modular Robotic Vehicle (MRV) active corner modules and Shape Memory Alloy tires for extreme terrain navigation.
+            </p>
+            <div class="project-reflection">
+              <strong>Reflective Insight:</strong>
+              Defended engineering trade-offs and tech-transfer feasibility directly to NASA flight directors and venture evaluators.
+            </div>
+            <div class="tech-tags">
+              <span class="tech-tag">Tech Transfer</span>
+              <span class="tech-tag">CAD / Systems</span>
+              <span class="tech-tag">Autonomous EV</span>
+            </div>
+            <div class="project-badge">&bull; National Semifinalist (Top 7 Teams in US)</div>
+          </div>
+        </article>
+
+        <!-- 07. NASA CaSGC Physical Prototype -->
+        <article class="project-card">
+          <div class="project-thumb">
+            <img src="assets/project-casgc-rover.png" alt="NASA CaSGC Rover" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <div class="project-thumb-placeholder" style="display: none;">
+              [Mechatronics Photo Placeholder]<br><code>assets/project-casgc-rover.png</code>
+            </div>
+          </div>
+          <div class="project-content">
+            <div class="project-dates">Summer 2022 &bull; NASA California Space Grant</div>
+            <h3 class="project-title">RExCom Rover: Physical Mechatronics Prototype</h3>
+            <p class="project-abstract">
+              Fabricated a functional lunar rover with 4-wheel stepper motors, 3D-printed Mecanum wheels, an Arduino Mega shield, nRF24L01 RF controller, and stereoscopic dual ESP32-CAM FPV.
+            </p>
+            <div class="project-reflection">
+              <strong>Reflective Insight:</strong>
+              Confronted real-world hardware failure modes: solved driver thermal dissipation and RF signal dropouts through hands-on bench testing.
+            </div>
+            <div class="tech-tags">
+              <span class="tech-tag">Arduino Mega</span>
+              <span class="tech-tag">Mecanum Wheels</span>
+              <span class="tech-tag">RF Teleoperation</span>
+            </div>
+            <div class="project-badge">&bull; CaSGC Student Symposium Presentation</div>
+          </div>
+        </article>
+
+        <!-- 08. NASA NCAS Lunar Swarm -->
+        <article class="project-card">
+          <div class="project-thumb">
+            <img src="assets/project-ncas-swarm.png" alt="NASA NCAS" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <div class="project-thumb-placeholder" style="display: none;">
+              [Mission Schematic Placeholder]<br><code>assets/project-ncas-swarm.png</code>
+            </div>
+          </div>
+          <div class="project-content">
+            <div class="project-dates">Fall 2021 – Spring 2022 &bull; NASA NCAS</div>
+            <h3 class="project-title">Lunar Swarm Mission Architecture (RExCom)</h3>
+            <p class="project-abstract">
+              Designed a swarm exploration architecture utilizing four autonomous rovers to deploy Disruption-Tolerant Networking (DTN) seismic surface pods drilled directly into lunar regolith.
+            </p>
+            <div class="project-reflection">
+              <strong>Reflective Insight:</strong>
+              Formulated the core architectural concept that inspired all my subsequent embedded teleoperation research.
+            </div>
+            <div class="tech-tags">
+              <span class="tech-tag">DTN Nodes</span>
+              <span class="tech-tag">Swarm Dynamics</span>
+              <span class="tech-tag">Mission Architecture</span>
+            </div>
+            <div class="project-badge">&bull; Profiled in NASA NCAS Snapshot</div>
+          </div>
+        </article>
+
+        <!-- 09. BMSIS Geodynamics -->
+        <article class="project-card">
+          <div class="project-thumb">
+            <img src="assets/project-bmsis-geo.png" alt="BMSIS Geodynamics" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <div class="project-thumb-placeholder" style="display: none;">
+              [Unity Simulation Placeholder]<br><code>assets/project-bmsis-geo.png</code>
+            </div>
+          </div>
+          <div class="project-content">
+            <div class="project-dates">2021 – 2022 &bull; BMSIS Young Scientist Program</div>
+            <h3 class="project-title">Geodynamics-Based Simulation &amp; Planetary Modeling</h3>
+            <p class="project-abstract">
+              Modeled mantle Rayleigh-Bénard convection to simulate crustal tectonic deformations in Unity, linking deep Earth heat transfer to volcanic hazard distribution and civilization trade routes.
+            </p>
+            <div class="project-reflection">
+              <strong>Reflective Insight:</strong>
+              My initial introduction to scientific programming under Dr. Lev Horodyskyj, igniting my passion for computational modeling.
+            </div>
+            <div class="tech-tags">
+              <span class="tech-tag">Unity</span>
+              <span class="tech-tag">C#</span>
+              <span class="tech-tag">Geodynamics</span>
+            </div>
+            <div class="project-badge">&bull; BMSIS YSP Alumnus &amp; Symposium Poster</div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Curriculum Vitae Section -->
+  <section id="cv">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-eyebrow">Academic Credentials</div>
+        <h2 class="section-title">Curriculum Vitae</h2>
+        <p style="color: var(--text-muted); margin-top: 0.5rem;">
+          Verified record of degrees, publications, presentations, and technical capabilities.
+        </p>
+      </div>
+
+      <div class="cv-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <h3 style="font-size: 1.25rem;">David Orta — Comprehensive Academic CV</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Updated October 2026 &bull; Format: PDF</p>
+          </div>
+          <a href="assets/david-orta-cv.pdf" target="_blank" download class="btn btn-primary">
+            Download PDF CV
+          </a>
+        </div>
+
+        <div class="cv-frame-container">
+          <iframe src="assets/david-orta-cv.pdf" title="David Orta CV">
+            <p>Your browser does not support PDF embeds. Please <a href="assets/david-orta-cv.pdf">download the PDF</a> directly.</p>
+          </iframe>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Institutional Affiliations -->
+  <section id="affiliations">
+    <div class="container">
+      <div class="section-header">
+        <div class="section-eyebrow">Institutional Network</div>
+        <h2 class="section-title">Research &amp; Community Affiliations</h2>
+      </div>
+
+      <div class="affiliations-grid">
+        <div class="affiliation-box">
+          <h4>CSUMB UROC</h4>
+          <span>Koret Scholar Fellow</span>
+        </div>
+        <div class="affiliation-box">
+          <h4>Science Voices</h4>
+          <span>Research Collaborator</span>
+        </div>
+        <div class="affiliation-box">
+          <h4>BMSIS</h4>
+          <span>YSP Alumnus</span>
+        </div>
+        <div class="affiliation-box">
+          <h4>A-CLUe</h4>
+          <span>Co-Founder &amp; Director</span>
+        </div>
+        <div class="affiliation-box">
+          <h4>CSUMB SALC</h4>
+          <span>Club Leadership</span>
+        </div>
+        <div class="affiliation-box">
+          <h4>NASA CaSGC &amp; NCAS</h4>
+          <span>Alumnus Scholar</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>&copy; 2026 David Orta. Designed for UROC Level 1 ePortfolio &amp; Graduate School Review.</p>
+      <p style="margin-top: 0.5rem; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--jade);">
+        Built with semantic HTML5, modern CSS custom properties &amp; zero bloated dependencies.
+      </p>
+    </div>
+  </footer>
+
+  <!-- Light/Dark Mode JavaScript -->
+  <script>
+    const toggleBtn = document.getElementById('theme-toggle');
+    const root = document.documentElement;
+
+    // Detect saved preference or match user's OS preference
+    const savedTheme = localStorage.getItem('theme');
+    const systemPrefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+
+    if (savedTheme) {
+      root.setAttribute('data-theme', savedTheme);
+    } else if (systemPrefersLight) {
+      root.setAttribute('data-theme', 'light');
+    }
+
+    // Toggle click listener
+    toggleBtn.addEventListener('click', () => {
+      const currentTheme = root.getAttribute('data-theme') || 'dark';
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+    });
+  </script>
+
+</body>
+</html>
